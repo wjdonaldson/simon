@@ -1,0 +1,36 @@
+Simon Game Pseudo-code
+
+1) Define required constants
+- sequence length to win - 8
+- timeout value for players turn (multiple of current sequence length?)
+- duration of each sequence element (light and sound)
+- duration of pause between sequence elements
+
+2) Define required variables used to track the state of the game
+- current sequence, an array
+- current element, array index
+- turn (computer or player)
+
+3) Store elements on the page that will be accessed in code more than once in variables to make code more concise, readable and performant.
+- DOM elements for each color space on the game board
+- DOM element for "Game Over" message;
+- DOM elements for sequence length and sequence remaining counters
+
+4) Upon loading the app should:
+- initialize the state variables
+- render those values to the page
+- start the game sequence with one random element
+- play the sequence
+- wait for the user to click a square
+
+5) Handle a player clicking a square
+- check that the space clicked is the next one in the sequence
+- if it is then set the current sequence element to the next one
+- otherwise display "Game Over" message
+
+6) Handle timeout of turn
+- display "Game Over" message
+
+7) Handle a player clicking the replay button
+- re-initialize
+
