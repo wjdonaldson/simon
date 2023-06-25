@@ -1,0 +1,48 @@
+* {
+  box-sizing: border-box;
+}
+
+#board {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  z-index: 1;
+}
+
+.quarter {
+  width: 100px;
+  height: 100px;
+}
+
+.top-left {
+  border-top-left-radius: 200px;
+  background: yellow;
+  float: left;
+}
+
+.top-right {
+  border-top-right-radius: 200px;
+  background: blue;
+  float: right;
+}
+
+.bottom-left {
+  border-bottom-left-radius: 200px;
+  background: red;
+  float: left;
+}
+
+.bottom-right {
+  border-bottom-right-radius: 200px;
+  background: green;
+  float: right;
+}
+.fill-circle {
+  width: 90px;
+  height: 90px;
+  position: absolute;
+  /* z-index: 5; */
+  background-color: white;
+  border-radius: 90px;
+  margin: 55px 0px 0px 55px;
+}
