@@ -22,36 +22,70 @@ body {
 .quarter {
   width: 50%;
   height: 50%;
+  border: 2px solid black;
+}
+
+.quarter:hover {
+  border: 6px solid black;
 }
 
 .top-left {
+  border: 2px solid black;
   border-top-left-radius: 100%;
-  background: yellow;
+  background: rgba(255, 255, 0, 0.5);
   float: left;
 }
 
 .top-right {
   border-top-right-radius: 100%;
-  background: blue;
+  background: rgba(0, 0, 255, 0.5);
   float: right;
 }
 
 .bottom-left {
   border-bottom-left-radius: 100%;
-  background: red;
+  background: rgba(255, 0, 0, 0.5);
   float: left;
 }
 
 .bottom-right {
   border-bottom-right-radius: 100%;
-  background: green;
+  background: rgba(0, 128, 0, 0.5);
   float: right;
 }
 .fill-circle {
-  width: 50%;
-  height: 50%;
+  width: 40%;
+  height: 40%;
   position: absolute;
   background-color: white;
+  border: 2px solid black;
   border-radius: 50%;
-  margin: 25%;
+  margin: 30%;
+}
+
+#game-display {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+
+#game-title {
+  grid-column: span 3;
+  font-size: 3em;
+}
+
+#game-start-btn {
+  grid-row: span 2;
+}
+
+#game-seq-len-val,
+#game-seq-left-val {
+  border: 4px solid black;
+  /* width: 3em; */
+}
+
+.flex-ctr {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

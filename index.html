@@ -9,11 +9,21 @@
   </head>
   <body>
     <div id="board">
-      <div class="quarter top-left"></div>
-      <div class="quarter top-right"></div>
-      <div class="quarter bottom-left"></div>
-      <div class="quarter bottom-right"></div>
+      <div id="tl" class="quarter top-left"></div>
+      <div id="tr" class="quarter top-right"></div>
+      <div id="bl" class="quarter bottom-left"></div>
+      <div id="br" class="quarter bottom-right"></div>
       <div class="fill-circle"></div>
+    </div>
+    <div id="game-display">
+      <div class="flex-ctr" id="game-title">SIMON</div>
+      <div class="flex-ctr" id="game-seq-len-lbl">Sequence Length</div>
+      <div class="flex-ctr" id="game-start-btn">
+        <button type="button">Start</button>
+      </div>
+      <div class="flex-ctr" id="game-seq-left-lbl">Sequent Remaining</div>
+      <div class="flex-ctr" id="game-seq-len-val">0</div>
+      <div class="flex-ctr" id="game-seq-left-val">0</div>
     </div>
   </body>
 </html>
