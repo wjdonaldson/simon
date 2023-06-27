@@ -15,13 +15,13 @@ const SPACES = {
     freq: 392.0, // G;
   },
   bl: {
-    num: 2,
+    num: 3,
     offColor: "rgba(255, 0, 0, 0.5)",
     onColor: "rgba(255, 0, 0, 1)",
     freq: 329.6, // E;
   },
   br: {
-    num: 2,
+    num: 4,
     offColor: "rgba(0, 128, 0, 0.5)",
     onColor: "rgba(0, 128, 0, 1)",
     freq: 784.0, // G (up octive);
@@ -29,19 +29,21 @@ const SPACES = {
 };
 
 /*----- state variables -----*/
-let sequence = [1];
+let sequence = [4, 3, 2, 1, 1];
 
 /*----- cached elements  -----*/
 const board = document.getElementById("board");
-const tlEl = document.getElementById("tl");
-const trEl = document.getElementById("tr");
-const blEl = document.getElementById("bl");
-const brEl = document.getElementById("br");
+const startBtn = document.getElementById("game-start-btn");
+// const tlEl = document.getElementById("tl");
+// const trEl = document.getElementById("tr");
+// const blEl = document.getElementById("bl");
+// const brEl = document.getElementById("br");
 
 const ctx = new AudioContext();
 var osc = null;
 var gain = null;
 var playing = false;
+var playingSeq = false;
 
 /*----- event listeners -----*/
 
@@ -51,24 +53,44 @@ init();
 function init() {
   console.log("Initializing");
   board.addEventListener("click", onClickSpace);
-
-  // renderSequence();
+  startBtn.addEventListener("click", onClickStart);
 }
 
-function renderSequence() {}
+function playSequence(idxToPlay) {
+  console.log(`playSequence(${idxToPlay})`);
+  if (idxToPlay === sequence.length) {
+    playingSeq = false;
+    console.log("Done playing sequence");
+    return;
+  }
+  for (let space in SPACES) {
+    if (SPACES[space].num === sequence[idxToPlay]) {
+      console.log(`iterate, ${sequence[idxToPlay]}`);
+      playingSeq = true;
+      const el = document.getElementById(space);
+      renderSpace(el);
+    }
+  }
+  setTimeout(function () {
+    playSequence(idxToPlay + 1);
+  }, 2000);
+}
 
 function renderSpace(el) {
   console.log("renderSpace");
-  console.log(el);
   const space = el.getAttribute("id");
-  console.log(space);
   el.style.backgroundColor = SPACES[space].onColor;
+  playTone(SPACES[space].freq);
 }
 
 function onClickSpace(evt) {
   renderSpace(evt.target);
   const space = evt.target.getAttribute("id");
-  playTone(SPACES[space].freq);
+  // playTone(SPACES[space].freq);
+}
+
+function onClickStart(evt) {
+  playSequence(0);
 }
 
 function playTone(hertz) {
