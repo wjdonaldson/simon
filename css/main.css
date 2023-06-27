@@ -61,6 +61,8 @@ body {
   border: 2px solid black;
   border-radius: 50%;
   margin: 30%;
+  color: black;
+  font-size: 8vmin;
 }
 
 #game-display {
@@ -69,12 +71,12 @@ body {
   grid-template-rows: 1fr 1fr 1fr;
 }
 
-#game-title {
+#game-message {
   grid-column: span 3;
-  font-size: 3em;
+  font-size: 5vmin;
 }
 
-#game-start-btn {
+#game-start-div {
   grid-row: span 2;
 }
 
