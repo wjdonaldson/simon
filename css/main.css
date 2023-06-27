@@ -26,7 +26,7 @@ body {
 }
 
 .quarter:hover {
-  border: 6px solid black;
+  border: 10px solid gray;
 }
 
 .top-left {
