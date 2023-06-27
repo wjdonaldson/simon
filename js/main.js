@@ -27,36 +27,45 @@ const SPACES = {
     freq: 784.0, // G (up octive);
   },
 };
+const TIME_BETWEEN_SPACES = 1000; // in ms
+const TIME_TO_PLAY_TONE = 500; // in ms
+const TIME_RAMP_DOWN = 0.1; // in seconds
+const WAIT_FOR_RAMP_DOWN = 110; // in ms
 
 /*----- state variables -----*/
 let sequence = [4, 3, 2, 1, 1];
+var playingSeq = false; // Is the computer currently playing a sequence?
 
 /*----- cached elements  -----*/
 const board = document.getElementById("board");
 const startBtn = document.getElementById("game-start-btn");
-// const tlEl = document.getElementById("tl");
-// const trEl = document.getElementById("tr");
-// const blEl = document.getElementById("bl");
-// const brEl = document.getElementById("br");
+const seqLen = document.getElementById("game-seq-len-val");
+const seqLeft = document.getElementById("game-seq-left-val");
 
+/*-- The audio cached elements --*/
 const ctx = new AudioContext();
 var osc = null;
 var gain = null;
-var playing = false;
-var playingSeq = false;
+var playingTone = false; // Is a tone currently playing?
 
 /*----- event listeners -----*/
+board.addEventListener("click", onClickSpace); // delegated to each space
+startBtn.addEventListener("click", onClickStart);
 
 /*----- functions -----*/
 init();
 
 function init() {
   console.log("Initializing");
-  board.addEventListener("click", onClickSpace);
-  startBtn.addEventListener("click", onClickStart);
 }
 
+// plays one element of the sequence, then recursively calls
+// itself to play the next element in the sequence.
 function playSequence(idxToPlay) {
+  if (idxToPlay === 0) {
+    seqLen.innerText = sequence.length;
+  }
+  seqLeft.innerText = sequence.length - idxToPlay;
   console.log(`playSequence(${idxToPlay})`);
   if (idxToPlay === sequence.length) {
     playingSeq = false;
@@ -73,7 +82,7 @@ function playSequence(idxToPlay) {
   }
   setTimeout(function () {
     playSequence(idxToPlay + 1);
-  }, 2000);
+  }, TIME_BETWEEN_SPACES);
 }
 
 function renderSpace(el) {
@@ -81,12 +90,15 @@ function renderSpace(el) {
   const space = el.getAttribute("id");
   el.style.backgroundColor = SPACES[space].onColor;
   playTone(SPACES[space].freq);
+  setTimeout(function () {
+    el.style.backgroundColor = SPACES[space].offColor;
+  }, TIME_TO_PLAY_TONE);
 }
 
 function onClickSpace(evt) {
   renderSpace(evt.target);
   const space = evt.target.getAttribute("id");
-  // playTone(SPACES[space].freq);
+  playTone(SPACES[space].freq);
 }
 
 function onClickStart(evt) {
@@ -94,12 +106,12 @@ function onClickStart(evt) {
 }
 
 function playTone(hertz) {
-  if (playing) {
-    console.log("already playing");
+  if (playingTone) {
+    console.log("already playing tone!");
     // TODO: if already playing, stop the current tone
     // before playing the new one - NOT WORKING!
     // gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.001);
-    // playing = false;
+    // playingTone = false;
     return;
   }
   osc = ctx.createOscillator();
@@ -108,13 +120,16 @@ function playTone(hertz) {
   gain.connect(ctx.destination);
   osc.type = "sine";
   osc.frequency.value = hertz; // value in hertz
-  playing = true;
+  playingTone = true;
   osc.start();
   setTimeout(function () {
     console.log("callback");
-    gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.5);
+    gain.gain.exponentialRampToValueAtTime(
+      0.00001,
+      ctx.currentTime + TIME_RAMP_DOWN
+    );
     setTimeout(function () {
-      playing = false;
-    }, 500);
-  }, 1000);
+      playingTone = false;
+    }, WAIT_FOR_RAMP_DOWN);
+  }, TIME_TO_PLAY_TONE);
 }
