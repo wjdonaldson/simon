@@ -29,9 +29,9 @@ const SPACES = {
 };
 const TIME_BETWEEN_SPACES = 1000; // in ms
 const TIME_BETWEEN_SEQ = 1000;
-const TIME_TO_PLAY_TONE = 500; // in ms
-const TIME_RAMP_DOWN = 0.1; // in seconds
-const WAIT_FOR_RAMP_DOWN = 110; // in ms
+const TIME_TO_PLAY_TONE = 800; // in ms
+const TIME_RAMP_DOWN = 0.001; // in seconds
+const WAIT_FOR_RAMP_DOWN = 2; // in ms
 
 /*----- state variables -----*/
 const simonSequence = [];
@@ -41,15 +41,16 @@ var playingSeq = null; // Is Simon currently playing a sequence?
 /*----- cached elements  -----*/
 const board = document.getElementById("board");
 const startBtn = document.getElementById("game-start-btn");
-const seqLen = document.getElementById("game-seq-len-val");
-const seqLeft = document.getElementById("game-seq-left-val");
+const score = document.getElementById("game-score-val");
 const statusMsg = document.getElementById("game-message");
 
 /*-- The audio cached elements --*/
-const ctx = new AudioContext();
+// const ctx = new AudioContext();
+var ctx = null;
 var osc = null;
-var gain = null;
-var playingTone = false; // Is a tone currently playing?
+// var gain = null;
+// var soundInitialized = false;
+//var playingTone = false; // Is a tone currently playing?
 
 /*----- event listeners -----*/
 board.addEventListener("click", onClickSpace); // delegated to each space
@@ -65,16 +66,13 @@ function init() {
   startBtn.disabled = false;
   playingSeq = false;
   playingTone = false;
-  statusMsg.innerText = "";
+  statusMsg.innerText = "Welcome";
+  score.innerText = 0;
 }
 
 // plays one element of the sequence, then recursively calls
 // itself to play the next element in the sequence.
 function playSequence(idxToPlay) {
-  if (idxToPlay === 0) {
-    seqLen.innerText = simonSequence.length;
-  }
-  seqLeft.innerText = simonSequence.length - idxToPlay;
   console.log(`playSequence(${idxToPlay})`);
   if (idxToPlay === simonSequence.length) {
     playingSeq = false;
@@ -106,7 +104,7 @@ function renderSpace(el) {
 }
 
 function onClickSpace(evt) {
-  if (playingSeq || playingTone) return;
+  //if (playingSeq || playingTone) return;
   renderSpace(evt.target);
   const space = evt.target.getAttribute("id");
   playerSequence.push(SPACES[space].num);
@@ -119,7 +117,7 @@ function onClickStart(evt) {
 
 function startSimonSequence() {
   startBtn.disabled = true;
-  startBtn.style.visibility = "hidden";
+  // startBtn.style.visibility = "hidden";
   statusMsg.innerText = "My Turn";
   simonSequence.push(generateRandonSpace());
   playSequence(0);
@@ -141,6 +139,8 @@ function checkCorrect() {
   const arr2 = simonSequence.slice(0, playerSequence.length);
   if (arr1.every((value, index) => value === arr2[index])) {
     if (playerSequence.length === simonSequence.length) {
+      score.innerText = playerSequence.length;
+      statusMsg.innerText = "My Turn";
       playerSequence.length = 0;
       setTimeout(function () {
         startSimonSequence();
@@ -149,37 +149,100 @@ function checkCorrect() {
   } else {
     init();
     statusMsg.innerText = "Game Over";
-    startBtn.innerText = "Start Over";
+    playErrorTone();
     startBtn.disabled = false;
-    startBtn.style.visibility = "visible";
   }
 }
 
 function playTone(hertz) {
-  if (playingTone) {
+  // initializeSound();
+  if (!ctx) ctx = new AudioContext();
+
+  // if (playingTone) {
+  if (osc) {
     console.log("already playing tone!");
     // TODO: if already playing, stop the current tone
     // before playing the new one - NOT WORKING!
     // gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.001);
+    osc.stop();
+    // osc = null;
     // playingTone = false;
-    return;
+    // return;
   }
   osc = ctx.createOscillator();
-  gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
+  osc.connect(ctx.destination);
+  // gain = ctx.createGain();
+  // gain.connect(ctx.destination);
+  // osc.connect(gain);
   osc.type = "sine";
   osc.frequency.value = hertz; // value in hertz
-  playingTone = true;
+  // playingTone = true;
   osc.start();
+  osc.stop(ctx.currentTime + TIME_TO_PLAY_TONE / 1000);
+  // gain.gain.setValueAtTime(1, ctx.currentTime);
+  // setTimeout(function () {
+  //   // osc.stop();
+  //   console.log("callback");
+  //   gain.gain.exponentialRampToValueAtTime(
+  //     0.00001,
+  //     ctx.currentTime + TIME_RAMP_DOWN
+  //   );
+  //   setTimeout(function () {
+  //     playingTone = false;
+  //   }, WAIT_FOR_RAMP_DOWN);
+  // }, TIME_TO_PLAY_TONE);
+  //  stopTone(gain);
+  // stopTone();
+  // gain.gain.setValueAtTime(0, ctx.currentTime);
+}
+
+function playErrorTone() {
+  if (!ctx) ctx = new AudioContext();
+  if (osc) {
+    console.log("already playing tone!");
+    osc.stop();
+  }
+  osc = ctx.createOscillator();
+  osc.connect(ctx.destination);
+  osc.type = "square";
+  osc.frequency.value = 150; // value in hertz
+  osc.start();
+  osc.stop(ctx.currentTime + TIME_TO_PLAY_TONE / 1000);
+}
+
+// function stopTone(stopGain) {
+function stopTone() {
+  // var stopGain = ctx.createGain();
+  // stopGain.connect(ctx.destination);
+  // osc.connect(stopGain);
+
   setTimeout(function () {
+    // osc.stop();
     // console.log("callback");
-    gain.gain.exponentialRampToValueAtTime(
-      0.00001,
-      ctx.currentTime + TIME_RAMP_DOWN
-    );
-    setTimeout(function () {
-      playingTone = false;
-    }, WAIT_FOR_RAMP_DOWN);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    // stopGain.gain.exponentialRampToValueAtTime(
+    //   0.00001,
+    //   ctx.currentTime + TIME_RAMP_DOWN
+    // );
+    // setTimeout(function () {
+    //   playingTone = false;
+    // }, WAIT_FOR_RAMP_DOWN);
+    playingTone = false;
   }, TIME_TO_PLAY_TONE);
 }
+
+// function initializeSound() {
+//   // if (!soundInitialized) {
+//   if (!ctx) {
+//     ctx = new AudioContext();
+//     console.log("Sound initialized.");
+//     // osc = ctx.createOscillator();
+//     // osc.type = "sine";
+//     // gain = ctx.createGain();
+//     // osc.connect(gain);
+//     // gain.connect(ctx.destination);
+//     // gain.gain.setValueAtTime(0, ctx.currentTime);
+//     // osc.start();
+//     // soundInitialized = true;
+//   }
+// }
