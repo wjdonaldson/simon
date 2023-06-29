@@ -9,6 +9,43 @@ body {
   align-items: center;
 }
 
+header {
+  display: flex;
+  width: 100vw;
+  align-items: center;
+  height: 12vh;
+  background-color: lightgray;
+  border-style: solid;
+}
+
+#game-score {
+  margin: 10px;
+  background-color: white;
+  font-size: 3vw;
+  border-style: solid;
+  height: 10vh;
+  width: 10vw;
+  min-width: 75px;
+}
+
+#game-message {
+  height: 10vh;
+  width: 75vw;
+  font-size: 6vmin;
+  /* background-color: white; */
+  margin: auto;
+}
+
+#game-high-score {
+  margin: 10px 10px 10px auto;
+  background-color: white;
+  font-size: 3vw;
+  border-style: solid;
+  height: 10vh;
+  width: 10vw;
+  min-width: 75px;
+}
+
 #board {
   width: 80vmin;
   height: 80vmin;
@@ -24,10 +61,6 @@ body {
   height: 50%;
   border: 2px solid black;
 }
-
-/* .quarter:hover {
-  border: 10px solid gray;
-} */
 
 .top-left {
   border: 2px solid black;
@@ -65,42 +98,16 @@ body {
   font-size: 8vmin;
 }
 
-header {
-  display: flex;
-  width: 100vw;
-  align-items: center;
-  height: 10vh;
-  background-color: lightgray;
-}
-
 #game-start-btn {
-  margin: 10px;
-  font-size: 3vw;
+  height: 10%;
+  width: 20%;
+  position: absolute;
+  margin: 55% 40% 35% 40%;
+  font-size: 3vmin;
   border-radius: 10%;
   background-color: white;
-  width: 10vw;
-  min-width: 75px;
+  box-shadow: 0.5vmin 0.5vmin #888888;
 }
-
-#game-message {
-  width: 75vw;
-  font-size: 5vw;
-  /* background-color: white; */
-  margin: auto;
-}
-
-#game-score {
-  margin: 10px 10px 10px auto;
-  background-color: white;
-  font-size: 3vw;
-  border-style: solid;
-  width: 10vw;
-  min-width: 75px;
-}
-
-/* header > div:last-child {
-  margin-left: auto;
-} */
 
 .flex-ctr {
   display: flex;

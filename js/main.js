@@ -43,6 +43,7 @@ var enableClick = null;
 const board = document.getElementById("board");
 const startBtn = document.getElementById("game-start-btn");
 const score = document.getElementById("game-score-val");
+const highScore = document.getElementById("game-high-score-val");
 const statusMsg = document.getElementById("game-message");
 
 /*-- The audio cached elements --*/
@@ -132,6 +133,11 @@ function checkCorrect() {
   if (arr1.every((value, index) => value === arr2[index])) {
     if (playerSequence.length === simonSequence.length) {
       score.innerText = playerSequence.length;
+      console.log(playerSequence.length);
+      console.log(parseInt(highScore.innerText));
+      if (playerSequence.length > parseInt(highScore.innerText)) {
+        highScore.innerText = playerSequence.length;
+      }
       statusMsg.innerText = "My Turn";
       enableClick = false;
       playerSequence.length = 0;
@@ -150,12 +156,13 @@ function checkCorrect() {
 function playTone(hertz) {
   if (!ctx) ctx = new AudioContext();
   if (osc) {
+    console.log("HERE!!!");
     osc.stop();
   }
   osc = ctx.createOscillator();
   osc.connect(ctx.destination);
   osc.type = "triangle";
-  osc.frequency.value = hertz ? hertz : 100; // value in hertz
+  osc.frequency.value = hertz ? hertz : 80; // value in hertz
   osc.start();
   osc.stop(ctx.currentTime + TIME_TO_PLAY_TONE / 1000);
 }
