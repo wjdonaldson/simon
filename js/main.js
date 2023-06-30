@@ -61,7 +61,6 @@ startBtn.addEventListener("click", onClickStart);
 init();
 
 function init() {
-  console.log("Initializing");
   simonSequence.length = 0;
   playerSequence.length = 0;
   startBtn.disabled = false;
@@ -94,7 +93,6 @@ function playSequence(idxToPlay) {
 
 function renderSpace(el) {
   if (renderTimeout) {
-    console.log("already lit");
     clearTimeout(renderTimeout);
     clearRender.spaceEl.style.backgroundColor = clearRender.color;
   }
