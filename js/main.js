@@ -4,7 +4,7 @@
 const SPACES = {
   tl: {
     num: 1,
-    offColor: "rgba(255, 255, 0, 0.3)",
+    offColor: "rgba(255, 255, 0, 0.2)",
     onColor: "rgba(255, 255, 0, 1)",
     freq: 277.2, // C#,
   },
@@ -28,16 +28,19 @@ const SPACES = {
   },
 };
 const TIME_BETWEEN_SPACES = 1000; // in ms
-const TIME_BETWEEN_SEQ = 1000;
+const TIME_BETWEEN_SEQ = 400;
 const TIME_TO_PLAY_TONE = 800; // in ms
-const TIME_RAMP_DOWN = 0.001; // in seconds
-const WAIT_FOR_RAMP_DOWN = 2; // in ms
 
 /*----- state variables -----*/
 const simonSequence = [];
 const playerSequence = [];
 var playingSeq = null; // Is Simon currently playing a sequence?
 var enableClick = null;
+renderTimeout = null;
+var clearRender = {
+  spaceEl: null,
+  color: null,
+};
 
 /*----- cached elements  -----*/
 const board = document.getElementById("board");
@@ -63,10 +66,9 @@ function init() {
   playerSequence.length = 0;
   startBtn.disabled = false;
   playingSeq = false;
-  playingTone = false;
   enableClick = false;
+  curIdx = null;
   statusMsg.innerText = "Welcome";
-  score.innerText = 0;
 }
 
 // plays one element of the sequence, then recursively calls
@@ -80,38 +82,46 @@ function playSequence(idxToPlay) {
   }
   for (let space in SPACES) {
     if (SPACES[space].num === simonSequence[idxToPlay]) {
-      // console.log(`iterate, ${simonSequence[idxToPlay]}`);
       playingSeq = true;
       const el = document.getElementById(space);
       renderSpace(el);
     }
   }
-  setTimeout(function () {
-    playSequence(idxToPlay + 1);
+  setTimeout(() => {
+    playSequence(++idxToPlay);
   }, TIME_BETWEEN_SPACES);
 }
 
 function renderSpace(el) {
-  // console.log("renderSpace");
-  const space = el.getAttribute("id");
+  if (renderTimeout) {
+    console.log("already lit");
+    clearTimeout(renderTimeout);
+    clearRender.spaceEl.style.backgroundColor = clearRender.color;
+  }
+  var space = el.getAttribute("id");
   el.style.backgroundColor = SPACES[space].onColor;
+  clearRender.spaceEl = el;
+  clearRender.color = SPACES[space].offColor;
   playTone(SPACES[space].freq);
-  setTimeout(function () {
-    el.style.backgroundColor = SPACES[space].offColor;
+  renderTimeout = setTimeout(() => {
+    clearRender.spaceEl.style.backgroundColor = clearRender.color;
+    renderTimeout = null;
   }, TIME_TO_PLAY_TONE);
 }
 
 function onClickSpace(evt) {
   if (!enableClick) return;
-  renderSpace(evt.target);
   const space = evt.target.getAttribute("id");
   playerSequence.push(SPACES[space].num);
+  renderSpace(evt.target);
   checkCorrect();
 }
 
 function onClickStart(evt) {
-  // short delay first???
-  startSimonSequence();
+  score.innerText = 0;
+  setTimeout(() => {
+    startSimonSequence();
+  }, TIME_BETWEEN_SEQ);
 }
 
 function startSimonSequence() {
@@ -133,15 +143,13 @@ function checkCorrect() {
   if (arr1.every((value, index) => value === arr2[index])) {
     if (playerSequence.length === simonSequence.length) {
       score.innerText = playerSequence.length;
-      console.log(playerSequence.length);
-      console.log(parseInt(highScore.innerText));
       if (playerSequence.length > parseInt(highScore.innerText)) {
         highScore.innerText = playerSequence.length;
       }
-      statusMsg.innerText = "My Turn";
       enableClick = false;
       playerSequence.length = 0;
-      setTimeout(function () {
+      setTimeout(() => {
+        statusMsg.innerText = "My Turn";
         startSimonSequence();
       }, TIME_BETWEEN_SPACES + TIME_BETWEEN_SEQ);
     }
@@ -156,7 +164,6 @@ function checkCorrect() {
 function playTone(hertz) {
   if (!ctx) ctx = new AudioContext();
   if (osc) {
-    console.log("HERE!!!");
     osc.stop();
   }
   osc = ctx.createOscillator();
